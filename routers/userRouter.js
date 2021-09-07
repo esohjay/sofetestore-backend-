@@ -46,7 +46,12 @@ userRouter.post(
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8),
     });
-
+    if (
+      (user.email === "sofetestore@gmail.com" && user.name === Admin) ||
+      (user.email === "sofetecontact@gmail.com" && user.name === Admin)
+    ) {
+      user.isAdmin = true;
+    }
     const createdUser = await user.save();
     res.send({
       _id: createdUser._id,
