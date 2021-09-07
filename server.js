@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["https://sofetestores.netlify.app"],
+    origin: ["https://sofetestore.herokuapp.com"],
   })
 );
 mongoose.connect(
