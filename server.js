@@ -3,6 +3,8 @@ require("dotenv").config();
 //const dotenv = require("dotenv");
 const session = require("express-session");
 const mongoose = require("mongoose");
+const mongoSanitize = require("express-mongo-sanitize");
+const MongoStore = require("connect-mongo");
 const userRouter = require("./routers/userRouter.js");
 const productRouter = require("./routers/productRouter.js");
 const orderRouter = require("./routers/orderRouter.js");
@@ -31,9 +33,19 @@ mongoose.connect(
     useFindAndModify: false,
   }
 );
-
+app.use(mongoSanitize());
 const secret = process.env.SECRET || "coded";
+const store = MongoStore.create({
+  mongoUrl: process.env.MONGODB_URL || "mongodb://localhost/sofete-store",
+  secret,
+  touchAfter: 24 * 60 * 60,
+});
+store.on("error", function (e) {
+  console.log("session error", e);
+});
+
 const sessionConfig = {
+  store,
   secret,
   resave: false,
   saveUninitialized: true,
