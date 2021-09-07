@@ -14,16 +14,16 @@ const wishlistRouter = require("./routers/wishlistRouter.js");
 const enquiryRouter = require("./routers/enquiryRouter.js");
 const salesRouter = require("./routers/salesRouter.js");
 const path = require("path");
-const cors = require("cors");
+//const cors = require("cors");
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
+/*app.use(
   cors({
-    origin: ["https://sofetestore.herokuapp.com"],
+    origin: ["https://sofetestores.netlify.app"],
   })
-);
+);*/
 mongoose.connect(
   process.env.MONGODB_URL || "mongodb://localhost/sofete-store",
   {
