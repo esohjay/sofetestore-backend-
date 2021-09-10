@@ -54,7 +54,7 @@ const sessionConfig = {
     secure: true,
     expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
     maxAge: 1000 * 60 * 60 * 24 * 7,
-    sameSite: none,
+    sameSite: "none",
   },
 };
 app.use(session(sessionConfig));
@@ -77,5 +77,6 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
-  console.log(`Serve at http://localhost:${port}`);
+  console.log(`Serve at port:${port}`);
 });
+//http://127.0.0.1:5000
