@@ -22,6 +22,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({ credentials: true, origin: "https://sofetestores.netlify.app" })
 );
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "https://sofetestores.netlify.app");
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin,X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 mongoose.connect(
   process.env.MONGODB_URL || "mongodb://localhost/sofete-store",
   {
