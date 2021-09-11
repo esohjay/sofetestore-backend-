@@ -20,9 +20,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
-  cors({
-    origin: "https://sofetestores.netlify.app",
-  })
+  cors({ credentials: true, origin: "https://sofetestores.netlify.app" })
 );
 mongoose.connect(
   process.env.MONGODB_URL || "mongodb://localhost/sofete-store",
