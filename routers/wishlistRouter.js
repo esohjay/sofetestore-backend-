@@ -49,7 +49,8 @@ wishlistRouter.get("/wishlistitems/:id", async (req, res) => {
   const { id } = req.params;
   if (id === "empty") {
     res.send({ message: "Your Wishlist is Empty", myWishlistItems: [] });
-  } else {
+  }
+  if (id !== "empty") {
     const wishlistItems = await Wishlist.findOne({
       _id: id,
     });

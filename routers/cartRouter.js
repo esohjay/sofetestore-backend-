@@ -52,7 +52,8 @@ cartRouter.get("/cartitems/:id", async (req, res) => {
   const { id } = req.params;
   if (id === "empty") {
     res.send({ message: "Your Cart is Empty", myCartItems: [] });
-  } else {
+  }
+  if (id !== "empty") {
     const cartItems = await Cart.findOne({ _id: id }).populate("myProduct");
 
     for (let item of cartItems.items) {
