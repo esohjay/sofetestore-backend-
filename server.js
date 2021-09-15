@@ -22,15 +22,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({ credentials: true, origin: "https://sofetestores.netlify.app" })
 );
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://sofetestores.netlify.app");
+/*app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header("Access-Control-Allow-Credentials", true);
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin,X-Requested-With, Content-Type, Accept"
+    "Origin,X-Requested-With, Content-Type, Authorization, Cookie, Accept-Language, Content-Language, Host, Accept"
   );
   next();
-});
+});*/
 mongoose.connect(
   process.env.MONGODB_URL || "mongodb://localhost/sofete-store",
   {
@@ -59,8 +59,8 @@ const sessionConfig = {
   cookie: {
     httpOnly: true,
     secure: true,
-    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-    maxAge: 1000 * 60 * 60 * 24 * 7,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 30,
+    maxAge: 1000 * 60 * 60 * 24 * 30,
     sameSite: "none",
   },
 };

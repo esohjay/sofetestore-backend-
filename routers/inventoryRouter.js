@@ -38,7 +38,38 @@ inventoryRouter.get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
-    const inventory = await Inventory.find({}).populate("products");
+    const batch = req.query.batch || "";
+    const origin = req.query.origin || "";
+    const costMin =
+      req.query.costMin && Number(req.query.costMin) !== 0
+        ? Number(req.query.costMin)
+        : 0;
+    const costMax =
+      req.query.costMax && Number(req.query.costMax) !== 0
+        ? Number(req.query.costMax)
+        : 0;
+    const dateMin =
+      req.query.dateMin && req.query.dateMin !== ""
+        ? new Date(req.query.dateMin)
+        : "";
+    const dateMax =
+      req.query.dateMax && req.query.dateMax !== ""
+        ? new Date(req.query.dateMax)
+        : "";
+    const batchFilter = batch
+      ? { batch: { $regex: batch, $options: "i" } }
+      : {};
+    const costFilter =
+      costMin && costMax ? { cost: { $gte: costMin, $lte: costMax } } : {};
+    const dateFilter =
+      dateMin && dateMax ? { date: { $gte: dateMin, $lte: dateMax } } : {};
+    const originFilter = origin ? { origin } : {};
+    const inventory = await Inventory.find({
+      ...batchFilter,
+      ...costFilter,
+      ...dateFilter,
+      ...originFilter,
+    }).populate("products");
     res.send(inventory);
   })
 );

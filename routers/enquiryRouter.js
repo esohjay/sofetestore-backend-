@@ -1,6 +1,6 @@
 const express = require("express");
 const expressAsyncHandler = require("express-async-handler");
-
+const User = require("../models/userModel.js");
 const Subscribe = require("../models/subscribeModel.js");
 const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
@@ -95,6 +95,56 @@ enquiryRouter.post(
       smtpTransport.close();
     });
     res.status(201).send({ message: "Message Received" });
+  })
+);
+
+enquiryRouter.post(
+  "/bulkmail",
+  expressAsyncHandler(async (req, res) => {
+    const users = await User.find({});
+    const subscribers = await Subscribe.find({});
+    const receiverEmails = [];
+    for (let user of users) {
+      if (!receiverEmails.includes(user.email)) {
+        receiverEmails.push(user.email);
+      }
+    }
+    for (let subscriber of subscribers) {
+      if (!receiverEmails.includes(subscriber.email)) {
+        receiverEmails.push(subscriber.email);
+      }
+    }
+    const { message, title } = req.body;
+
+    const output = `
+  
+  <h3>Dear Customer</h3>
+<p>${message}</p>`;
+    const smtpTransport = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
+        accessToken: accessToken,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+    const msg = {
+      to: receiverEmails,
+      from: process.env.EMAIL,
+      subject: title,
+      html: output,
+    };
+    await smtpTransport.sendMail(msg, (error, response) => {
+      error ? console.log(error) : console.log(response);
+      smtpTransport.close();
+    });
+    res.status(201).send({ message: "Message sent" });
   })
 );
 

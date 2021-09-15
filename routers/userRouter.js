@@ -13,7 +13,16 @@ userRouter.get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
-    const users = await User.find({});
+    const search = req.query.search || "";
+    const searchFilter = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+    const users = await User.find({ ...searchFilter });
     res.send(users);
   })
 );
@@ -26,6 +35,7 @@ userRouter.post(
         res.send({
           _id: user._id,
           name: user.name,
+          phone: user.phone,
           email: user.email,
           isAdmin: user.isAdmin,
           token: generateToken(user),

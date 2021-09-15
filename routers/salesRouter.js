@@ -61,7 +61,45 @@ salesRouter.get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
-    const sales = await Sales.find({});
+    const batch = req.query.batch || "";
+    const nameSku = req.query.nameSku || "";
+    const priceMin =
+      req.query.priceMin && Number(req.query.priceMin) !== 0
+        ? Number(req.query.priceMin)
+        : 0;
+    const priceMax =
+      req.query.priceMax && Number(req.query.priceMax) !== 0
+        ? Number(req.query.priceMax)
+        : 0;
+    const dateMin =
+      req.query.dateMin && req.query.dateMin !== ""
+        ? new Date(req.query.dateMin)
+        : "";
+    const dateMax =
+      req.query.dateMax && req.query.dateMax !== ""
+        ? new Date(req.query.dateMax)
+        : "";
+    const batchFilter = batch
+      ? { batch: { $regex: batch, $options: "i" } }
+      : {};
+    const priceFilter =
+      priceMin && priceMax ? { price: { $gte: priceMin, $lte: priceMax } } : {};
+    const dateFilter =
+      dateMin && dateMax ? { date: { $gte: dateMin, $lte: dateMax } } : {};
+    const nameSkuFilter = nameSku
+      ? {
+          $or: [
+            { name: { $regex: nameSku, $options: "i" } },
+            { sku: { $regex: nameSku, $options: "i" } },
+          ],
+        }
+      : {};
+    const sales = await Sales.find({
+      ...batchFilter,
+      ...priceFilter,
+      ...dateFilter,
+      ...nameSkuFilter,
+    });
     res.send(sales);
   })
 );

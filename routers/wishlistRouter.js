@@ -11,17 +11,18 @@ wishlistRouter.post(
   "/:id",
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { size } = req.body;
+    const { size, wishlistId } = req.body;
 
-    if (!req.session.wishlistId) {
+    if (!wishlistId) {
       const wishlist = new Wishlist({
         items: [{ productId: id, quantity: 1, size: size }],
       });
-      req.session.wishlistId = wishlist._id;
+      // req.session.wishlistId = wishlist._id;
       await wishlist.save();
+      res.status(201).send({ idWishlist: wishlist._id, wishlistId });
     } else {
-      const idWishlist = req.session.wishlistId;
-      const wishlist = await Wishlist.findById({ _id: idWishlist });
+      //const idWishlist = req.session.wishlistId;
+      const wishlist = await Wishlist.findById({ _id: wishlistId });
       const existingItem = wishlist.items.find(
         (item) => item.productId === id && item.size === size
       );
@@ -38,28 +39,20 @@ wishlistRouter.post(
         });
       }
       await wishlist.save();
+      res.status(201).send({ idWishlist: wishlistId });
     }
-    const idWishlist = req.session.wishlistId;
-    const wishlistItems = await Wishlist.findById(idWishlist).populate(
-      "product"
-    );
-    //const cart = await Cart.findById({ _id: idCart });
-
-    res.status(201).send({
-      message: "New item added",
-      wishlist: wishlistItems,
-    });
   })
 );
 
 // Receive a GET request to show all items in wishlist
-wishlistRouter.get("/wishlistitems", async (req, res) => {
-  if (!req.session.wishlistId) {
+wishlistRouter.get("/wishlistitems/:id", async (req, res) => {
+  const { id } = req.params;
+  if (id === "empty") {
     res.send({ message: "Your Wishlist is Empty", myWishlistItems: [] });
   } else {
     const wishlistItems = await Wishlist.findOne({
-      _id: req.session.wishlistId,
-    }).populate("myProduct");
+      _id: id,
+    });
     const wishlistId = wishlistItems.id;
     for (let item of wishlistItems.items) {
       const product = await Product.findById(item.productId);
@@ -121,15 +114,13 @@ wishlistRouter.get(
 
 //clear all wishlist items
 wishlistRouter.put(
-  "/",
+  "/:id",
   expressAsyncHandler(async (req, res) => {
-    if (req.session.wishlistId) {
-      const wishlistItems = await Wishlist.findByIdAndUpdate(
-        req.session.wishlistId,
-        {
-          items: [],
-        }
-      );
+    const { id } = req.params;
+    if (id) {
+      const wishlistItems = await Wishlist.findByIdAndUpdate(id, {
+        items: [],
+      });
       const emptyWishlist = await wishlistItems.save();
       res.status(200).send({ message: "Cart items removed ", emptyWishlist });
     }
@@ -140,9 +131,9 @@ wishlistRouter.put(
   "/update/:id",
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { size, qty } = req.body;
+    const { size, qty, wishlistId } = req.body;
     //find out the user's wishlist
-    const wishlist = await Wishlist.findById(req.session.wishlistId);
+    const wishlist = await Wishlist.findById(wishlistId);
     //determine the particular particular product the user is trying to update from the list of products in the wishlist
     let existingItem = wishlist.items.find(
       (item) => item.productId === id && item.size === size

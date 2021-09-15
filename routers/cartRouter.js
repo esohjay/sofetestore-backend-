@@ -11,17 +11,18 @@ cartRouter.post(
   "/:id",
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { size } = req.body;
+    const { size, cartId } = req.body;
 
-    if (!req.session.cartId) {
+    if (!cartId) {
       const cart = new Cart({
         items: [{ productId: id, quantity: 1, size: size }],
       });
-      req.session.cartId = cart._id;
+      //req.session.cartId = cart._id;
       await cart.save();
+      res.status(201).send({ idCart: cart._id, cartId });
     } else {
-      const idCart = req.session.cartId;
-      const cart = await Cart.findById({ _id: idCart });
+      // const idCart = req.session.cartId;
+      const cart = await Cart.findById({ _id: cartId });
       const existingItem = cart.items.find(
         (item) => item.productId === id && item.size === size
       );
@@ -38,26 +39,21 @@ cartRouter.post(
         });
       }
       await cart.save();
+      res.status(201).send({ idCart: cartId });
     }
-    const idCart = req.session.cartId;
-    const cartItems = await Cart.findById(idCart).populate("product");
+    //const idCart = req.session.cartId;
+    //const cartItems = await Cart.findById(idCart).populate("product");
     //const cart = await Cart.findById({ _id: idCart });
-
-    res.status(201).send({
-      message: "New item added",
-      cart: cartItems,
-    });
   })
 );
 
 // Receive a GET request to show all items in cart
-cartRouter.get("/cartitems", async (req, res) => {
-  if (!req.session.cartId) {
+cartRouter.get("/cartitems/:id", async (req, res) => {
+  const { id } = req.params;
+  if (id === "empty") {
     res.send({ message: "Your Cart is Empty", myCartItems: [] });
   } else {
-    const cartItems = await Cart.findOne({ _id: req.session.cartId }).populate(
-      "myProduct"
-    );
+    const cartItems = await Cart.findOne({ _id: id }).populate("myProduct");
 
     for (let item of cartItems.items) {
       const product = await Product.findById(item.productId);
@@ -84,10 +80,11 @@ cartRouter.get("/cartitems", async (req, res) => {
 });
 //clear all cart items
 cartRouter.put(
-  "/",
+  "/:id",
   expressAsyncHandler(async (req, res) => {
-    if (req.session.cartId) {
-      const cartItems = await Cart.findByIdAndUpdate(req.session.cartId, {
+    const { id } = req.params;
+    if (id) {
+      const cartItems = await Cart.findByIdAndUpdate(id, {
         items: [],
       });
       const emptyCart = await cartItems.save();
@@ -102,9 +99,9 @@ cartRouter.put(
   "/update/:id",
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { size, qty } = req.body;
+    const { size, qty, cartId } = req.body;
     //find out the user's cart
-    const cart = await Cart.findById(req.session.cartId);
+    const cart = await Cart.findById(cartId);
     //determine the particular particular product the user is trying to update  from the list of products in the cart
     let existingItem = cart.items.find(
       (item) => item.productId === id && item.size === size

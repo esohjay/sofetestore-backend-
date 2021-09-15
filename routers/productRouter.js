@@ -15,6 +15,7 @@ productRouter.get(
   "/",
   expressAsyncHandler(async (req, res) => {
     const name = req.query.name || "";
+    const nameSku = req.query.nameSku || "";
     const category = req.query.category || "";
     const tag = req.query.tag || "";
     const order = req.query.order || "";
@@ -32,7 +33,14 @@ productRouter.get(
         : 0;
 
     const nameFilter = name ? { name: { $regex: name, $options: "i" } } : {};
-
+    const nameSkuFilter = nameSku
+      ? {
+          $or: [
+            { name: { $regex: nameSku, $options: "i" } },
+            { sku: { $regex: nameSku, $options: "i" } },
+          ],
+        }
+      : {};
     const categoryFilter = category ? { category } : {};
     const tagFilter = tag ? { tag } : {};
     const priceFilter = min && max ? { price: { $gte: min, $lte: max } } : {};
@@ -48,11 +56,12 @@ productRouter.get(
     const options = {
       page: req.query.page || 1,
       limit: 20,
-      sort: sortOrder,
+      sort: sortOrder || { createdAt: -1 },
     };
     const products = await Product.paginate(
       {
         ...nameFilter,
+        ...nameSkuFilter,
         ...priceFilter,
         ...categoryFilter,
         ...tagFilter,
@@ -60,6 +69,7 @@ productRouter.get(
       },
       options
     );
+
     res.send(products);
   })
 );

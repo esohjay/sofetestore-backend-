@@ -63,6 +63,12 @@ const orderSchema = new mongoose.Schema(
     isPaid: { type: Boolean, default: false },
     trackingNo: String,
     deliveryStatus: String,
+    deliveryTimeline: [
+      {
+        status: String,
+        date: Date,
+      },
+    ],
     paidAt: Date,
     isDelivered: { type: Boolean, default: false },
     deliveredAt: Date,

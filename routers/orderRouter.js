@@ -90,15 +90,15 @@ orderRouter.post(
       const output = `<h3>Dear ${name},</h3>
   <p>Your order on Sofete Store has been placed successfully and it is being processed. Your order details are listed below, you will be contacted to arrange for delivery. Thanks for your patronage.</p>
   <ul>
-    <li>Receiver Name: ${createdOrder.shippingAddress.fullName}</li>
-    <li> Receiver Email: ${email}</li>
+    <li>Receiver's Name: ${createdOrder.shippingAddress.fullName}</li>
+    <li> Receiver's Email: ${email}</li>
     <li>Phone: ${createdOrder.shippingAddress.phone}</li>
     <li>Address: ${createdOrder.shippingAddress.address}</li>
     <li>Shipping Method: ${createdOrder.shippingMethod}</li>
     <li>Tracking Number: ${createdOrder.trackingNo}</li>
     <li>Total Amount Paid: ${createdOrder.totalPrice}</li>
   </ul>
-  <h3>Message</h3>`;
+  <p>For further enquiry, you can text/call/Whatsapp us on +2348079588943 or send us an email on sofetecontact@gmail.com.</p>`;
 
       const buyerMsg = {
         to: `${email},sofetecontact@gmail.com`,
@@ -131,22 +131,13 @@ orderRouter.get(
   })
 );
 
-orderRouter.put(
-  "/:id/pay",
-  isAuth,
+orderRouter.get(
+  "/:id/track",
+
   expressAsyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findOne({ trackingNo: req.params.id });
     if (order) {
-      order.isPaid = true;
-      order.paidAt = Date.now();
-      order.paymentResult = {
-        id: req.body.id,
-        status: req.body.status,
-        update_time: req.body.update_time,
-        email_address: req.body.email_address,
-      };
-      const updatedOrder = await order.save();
-      res.send({ message: "Order Paid", order: updatedOrder });
+      res.send(order);
     } else {
       res.status(404).send({ message: "Order Not Found" });
     }
@@ -190,10 +181,15 @@ orderRouter.put(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id);
+    const { status } = req.body;
+
     if (order) {
-      order.isDelivered = true;
-      order.deliveredAt = Date.now();
-      order.deliveryStatus = "Delivered";
+      order.deliveryStatus = status;
+      order.deliveryTimeline.push({ status: status, date: Date.now() });
+      if (status === "Delivered") {
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+      }
       const updatedOrder = await order.save();
       res.send({ message: "Order Delivered", order: updatedOrder });
     } else {
