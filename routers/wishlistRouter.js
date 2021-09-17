@@ -13,11 +13,11 @@ wishlistRouter.post(
     const { id } = req.params;
     const { size, wishlistId } = req.body;
 
-    if (!wishlistId) {
+    if (wishlistId === "empty") {
       const wishlist = new Wishlist({
         items: [{ productId: id, quantity: 1, size: size }],
       });
-      // req.session.wishlistId = wishlist._id;
+      //req.session.wishlistId = wishlist._id;
       await wishlist.save();
       res.status(201).send({ idWishlist: wishlist._id, wishlistId });
     } else {
@@ -49,8 +49,7 @@ wishlistRouter.get("/wishlistitems/:id", async (req, res) => {
   const { id } = req.params;
   if (id === "empty") {
     res.send({ message: "Your Wishlist is Empty", myWishlistItems: [] });
-  }
-  if (id !== "empty") {
+  } else {
     const wishlistItems = await Wishlist.findOne({
       _id: id,
     });

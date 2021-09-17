@@ -13,15 +13,15 @@ cartRouter.post(
     const { id } = req.params;
     const { size, cartId } = req.body;
 
-    if (!cartId) {
+    if (cartId === "empty") {
       const cart = new Cart({
         items: [{ productId: id, quantity: 1, size: size }],
       });
-      //req.session.cartId = cart._id;
+      req.session.cartIds = cart._id;
       await cart.save();
       res.status(201).send({ idCart: cart._id, cartId });
     } else {
-      // const idCart = req.session.cartId;
+      const idCart = req.session.cartId;
       const cart = await Cart.findById({ _id: cartId });
       const existingItem = cart.items.find(
         (item) => item.productId === id && item.size === size
@@ -52,8 +52,7 @@ cartRouter.get("/cartitems/:id", async (req, res) => {
   const { id } = req.params;
   if (id === "empty") {
     res.send({ message: "Your Cart is Empty", myCartItems: [] });
-  }
-  if (id !== "empty") {
+  } else {
     const cartItems = await Cart.findOne({ _id: id }).populate("myProduct");
 
     for (let item of cartItems.items) {

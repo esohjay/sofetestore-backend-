@@ -19,11 +19,9 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({ credentials: true, origin: "https://sofetestores.netlify.app" })
-);
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 /*app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Origin","https://sofetestores.netlify.app", "http://localhost:3000");
   res.header("Access-Control-Allow-Credentials", true);
   res.header(
     "Access-Control-Allow-Headers",
@@ -82,7 +80,7 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });
 });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5555;
 app.listen(port, () => {
   console.log(`Serve at port:${port}`);
 });
