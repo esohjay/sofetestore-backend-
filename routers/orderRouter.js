@@ -41,6 +41,7 @@ orderRouter.post(
         paidAt: Date.now(),
       });
       order.trackingNo = order.id.slice(14);
+      order.deliveryTimeline.push({ status: "Pending", date: Date.now() });
       const createdOrder = await order.save();
       for (let order of createdOrder.items) {
         const price = order.quantity * order.product.price;

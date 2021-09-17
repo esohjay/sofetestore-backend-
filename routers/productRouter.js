@@ -19,6 +19,7 @@ productRouter.get(
     const category = req.query.category || "";
     const tag = req.query.tag || "";
     const order = req.query.order || "";
+    const page = req.query.page;
     const min =
       req.query.priceMin && Number(req.query.priceMin) !== 0
         ? Number(req.query.priceMin)
@@ -54,7 +55,7 @@ productRouter.get(
         ? { rating: -1 }
         : { _id: -1 };
     const options = {
-      page: req.query.page || 1,
+      page: page,
       limit: 20,
       sort: sortOrder || { createdAt: -1 },
     };

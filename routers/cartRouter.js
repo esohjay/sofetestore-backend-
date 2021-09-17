@@ -17,7 +17,7 @@ cartRouter.post(
       const cart = new Cart({
         items: [{ productId: id, quantity: 1, size: size }],
       });
-      req.session.cartIds = cart._id;
+      //req.session.cartIds = cart._id;
       await cart.save();
       res.status(201).send({ idCart: cart._id, cartId });
     } else {
