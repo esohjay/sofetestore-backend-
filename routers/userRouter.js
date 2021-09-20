@@ -57,8 +57,8 @@ userRouter.post(
       password: bcrypt.hashSync(req.body.password, 8),
     });
     if (
-      (user.email === "sofetestore@gmail.com" && user.name === Admin) ||
-      (user.email === "sofetecontact@gmail.com" && user.name === Admin)
+      (user.email === "sofetestore@gmail.com" && user.name === "Admin") ||
+      (user.email === "sofetecontact@gmail.com" && user.name === "Admin")
     ) {
       user.isAdmin = true;
     }
