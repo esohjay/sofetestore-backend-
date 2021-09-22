@@ -27,7 +27,7 @@ const productSchema = new mongoose.Schema(
     rating: { type: Number, default: 0 },
     numReviews: { type: Number, default: 0 },
     variation: [VariationSchema],
-    sku: String,
+    sku: { type: String, required: true, unique: true },
     tag: String,
     hotDeal: { type: Boolean, default: false },
     reviews: [
