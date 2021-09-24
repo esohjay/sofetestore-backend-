@@ -64,12 +64,18 @@ inventoryRouter.get(
     const dateFilter =
       dateMin && dateMax ? { date: { $gte: dateMin, $lte: dateMax } } : {};
     const originFilter = origin ? { origin } : {};
-    const inventory = await Inventory.find({
+    const options = {
+      sort: { createdAt: -1 },
+      populate: "proudcts",
+      limit: 2,
+      page: req.query.page,
+    };
+    const inventory = await Inventory.paginate({
       ...batchFilter,
       ...costFilter,
       ...dateFilter,
       ...originFilter,
-    }).populate("products");
+    });
     res.send(inventory);
   })
 );

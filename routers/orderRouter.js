@@ -148,7 +148,12 @@ orderRouter.get(
   "/",
   isAuth,
   expressAsyncHandler(async (req, res) => {
-    const orders = await Order.find({ user: req.user._id });
+    const options = {
+      sort: { createdAt: -1 },
+      limit: 2,
+      page: req.query.page,
+    };
+    const orders = await Order.paginate({ user: req.user._id }, options);
     res.send(orders);
   })
 );
@@ -157,7 +162,13 @@ orderRouter.get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
-    const orders = await Order.find({}).populate("user", "name");
+    const options = {
+      sort: { createdAt: -1 },
+      populate: "user",
+      limit: 2,
+      page: req.query.page,
+    };
+    const orders = await Order.paginate({}, options);
     res.send(orders);
   })
 );

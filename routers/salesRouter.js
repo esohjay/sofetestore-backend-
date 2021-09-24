@@ -94,7 +94,7 @@ salesRouter.get(
           ],
         }
       : {};
-    const sales = await Sales.find({
+    const sales = await Sales.paginate({
       ...batchFilter,
       ...priceFilter,
       ...dateFilter,

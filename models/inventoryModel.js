@@ -1,10 +1,5 @@
 const mongoose = require("mongoose");
-
-const SalesSchema = new mongoose.Schema({
-  varType: String,
-  value: String,
-  quantity: Number,
-});
+const mongoosePaginate = require("mongoose-paginate-v2");
 
 const inventorySchema = new mongoose.Schema(
   {
@@ -25,4 +20,5 @@ const inventorySchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+inventorySchema.plugin(mongoosePaginate);
 module.exports = mongoose.model("Inventory", inventorySchema);

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const mongoosePaginate = require("mongoose-paginate-v2");
 const SalesSchema = new mongoose.Schema(
   {
     name: String,
@@ -18,4 +18,5 @@ const SalesSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+SalesSchema.plugin(mongoosePaginate);
 module.exports = mongoose.model("Sales", SalesSchema);

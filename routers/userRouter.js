@@ -22,7 +22,7 @@ userRouter.get(
           ],
         }
       : {};
-    const users = await User.find({ ...searchFilter });
+    const users = await User.paginate({ ...searchFilter });
     res.send(users);
   })
 );
