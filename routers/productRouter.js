@@ -56,7 +56,7 @@ productRouter.get(
         : { _id: -1 };
     const options = {
       page: page,
-      limit: 2,
+      limit: 20,
       sort: sortOrder || { createdAt: -1 },
     };
     const products = await Product.paginate(
