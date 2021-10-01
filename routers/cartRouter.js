@@ -48,36 +48,45 @@ cartRouter.post(
 );
 
 // Receive a GET request to show all items in cart
-cartRouter.get("/cartitems/:id", async (req, res) => {
-  const { id } = req.params;
-  if (id === "empty") {
-    res.send({ message: "Your Cart is Empty", myCartItems: [] });
-  } else {
-    const cartItems = await Cart.findOne({ _id: id }).populate("myProduct");
+cartRouter.get(
+  "/cartitems/:id",
+  expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    if (id === "empty") {
+      res.send({ message: "Your Cart is Empty", myCartItems: [] });
+    } else if (id === "undefined") {
+      res.send({
+        myCartItems: "undefined",
+      });
+    } else {
+      const cartItems = await Cart.findOne({ _id: id }).populate("myProduct");
 
-    for (let item of cartItems.items) {
-      const product = await Product.findById(item.productId);
-      if (product) {
-        let varValue = product.variation.find(
-          (prodVar) => prodVar.value === item.size
-        );
-        const newProduct = {
-          name: product.name,
-          price: product.price,
-          qty: product.countInStock,
-          images: product.images,
-          id: product._id,
-          variation: varValue.quantity,
-        };
-        item.product = newProduct;
+      for (let item of cartItems.items) {
+        const product = await Product.findById(item.productId);
+        if (product) {
+          let varValue = product.variation.find(
+            (prodVar) => prodVar.value === item.size
+          );
+          const newProduct = {
+            name: product.name,
+            price: product.price,
+            qty: product.countInStock,
+            images: product.images,
+            id: product._id,
+          };
+          item.product = newProduct;
+          if (varValue) {
+            item.product.variation = varValue.quantity;
+          }
+        }
       }
-    }
 
-    res.send({
-      myCartItems: cartItems.items,
-    });
-  }
-});
+      res.send({
+        myCartItems: cartItems.items,
+      });
+    }
+  })
+);
 //clear all cart items
 cartRouter.put(
   "/:id",

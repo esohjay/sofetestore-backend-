@@ -22,7 +22,13 @@ userRouter.get(
           ],
         }
       : {};
-    const users = await User.paginate({ ...searchFilter });
+    const options = {
+      sort: { createdAt: -1 },
+
+      limit: 20,
+      page: req.query.page,
+    };
+    const users = await User.paginate({ ...searchFilter }, options);
     res.send(users);
   })
 );

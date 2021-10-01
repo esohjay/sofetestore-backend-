@@ -150,7 +150,7 @@ orderRouter.get(
   expressAsyncHandler(async (req, res) => {
     const options = {
       sort: { createdAt: -1 },
-      limit: 2,
+      limit: 20,
       page: req.query.page,
     };
     const orders = await Order.paginate({ user: req.user._id }, options);
@@ -165,7 +165,7 @@ orderRouter.get(
     const options = {
       sort: { createdAt: -1 },
       populate: "user",
-      limit: 2,
+      limit: 20,
       page: req.query.page,
     };
     const orders = await Order.paginate({}, options);

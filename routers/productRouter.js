@@ -215,10 +215,11 @@ productRouter.put(
     }
     //if user click the delete btn, qty value is 0.5 so we know we want to remove it
     if (qty === 0.1) {
+      variationItem.quantity = 0;
       //get the variation value that needs to be deleted
-      await product.updateOne({
+      /* await product.updateOne({
         $pull: { variation: { _id: { $in: varId } } },
-      });
+      });*/
 
       product.countInStock = product.variation.reduce(
         (a, c) => a + c.quantity,

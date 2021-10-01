@@ -62,6 +62,7 @@ salesRouter.get(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const batch = req.query.batch || "";
+    const page = req.query.page;
     const nameSku = req.query.nameSku || "";
     const priceMin =
       req.query.priceMin && Number(req.query.priceMin) !== 0
@@ -94,12 +95,20 @@ salesRouter.get(
           ],
         }
       : {};
-    const sales = await Sales.paginate({
-      ...batchFilter,
-      ...priceFilter,
-      ...dateFilter,
-      ...nameSkuFilter,
-    });
+    const options = {
+      page: page,
+      limit: 20,
+      sort: { createdAt: -1 },
+    };
+    const sales = await Sales.paginate(
+      {
+        ...batchFilter,
+        ...priceFilter,
+        ...dateFilter,
+        ...nameSkuFilter,
+      },
+      options
+    );
     res.send(sales);
   })
 );

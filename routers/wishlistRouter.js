@@ -45,38 +45,42 @@ wishlistRouter.post(
 );
 
 // Receive a GET request to show all items in wishlist
-wishlistRouter.get("/wishlistitems/:id", async (req, res) => {
-  const { id } = req.params;
-  if (id === "empty") {
-    res.send({ message: "Your Wishlist is Empty", myWishlistItems: [] });
-  } else {
-    const wishlistItems = await Wishlist.findOne({
-      _id: id,
-    });
-    const wishlistId = wishlistItems.id;
-    for (let item of wishlistItems.items) {
-      const product = await Product.findById(item.productId);
-      if (product) {
-        let varValue = product.variation.find(
-          (prodVar) => prodVar.value === item.size
-        );
-        const newProduct = {
-          name: product.name,
-          price: product.price,
-          qty: product.countInStock,
-          images: product.images,
-          id: product._id,
-          variation: varValue.quantity,
-        };
-        item.product = newProduct;
+wishlistRouter.get(
+  "/wishlistitems/:id",
+  expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    if (id === "empty") {
+      res.send({ message: "Your Wishlist is Empty", myWishlistItems: [] });
+    } else {
+      const wishlistItems = await Wishlist.findOne({
+        _id: id,
+      });
+      const wishlistId = wishlistItems.id;
+      for (let item of wishlistItems.items) {
+        const product = await Product.findById(item.productId);
+        if (product) {
+          let varValue = product.variation.find(
+            (prodVar) => prodVar.value === item.size
+          );
+          const newProduct = {
+            name: product.name,
+            price: product.price,
+            qty: product.countInStock,
+            images: product.images,
+            id: product._id,
+            variation: varValue.quantity,
+          };
+          item.product = newProduct;
+        }
       }
+      res.send({
+        myWishlistItems: wishlistItems.items,
+        wishlistId,
+      });
+      //  res.send(wishlistItems);
     }
-    res.send({
-      myWishlistItems: wishlistItems.items,
-      wishlistId,
-    });
-  }
-});
+  })
+);
 
 // Receive a GET request to show all items in wishlist
 wishlistRouter.get(

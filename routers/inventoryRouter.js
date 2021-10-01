@@ -67,15 +67,18 @@ inventoryRouter.get(
     const options = {
       sort: { createdAt: -1 },
       populate: "proudcts",
-      limit: 2,
+      limit: 20,
       page: req.query.page,
     };
-    const inventory = await Inventory.paginate({
-      ...batchFilter,
-      ...costFilter,
-      ...dateFilter,
-      ...originFilter,
-    });
+    const inventory = await Inventory.paginate(
+      {
+        ...batchFilter,
+        ...costFilter,
+        ...dateFilter,
+        ...originFilter,
+      },
+      options
+    );
     res.send(inventory);
   })
 );
