@@ -19,7 +19,7 @@ cartRouter.post(
       });
       //req.session.cartIds = cart._id;
       await cart.save();
-      res.status(201).send({ idCart: cart._id, cartId });
+      res.status(201).send({ idCart: cart._id });
     } else {
       const idCart = req.session.cartId;
       const cart = await Cart.findById({ _id: cartId });
